@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
+import org.apache.camel.language.simple.Simple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -28,28 +29,27 @@ public class BANCSDBConnectorImplDao {
 	@Autowired
 	private DataSource dataSource;
 
-//	public ObjectNode BancsAMLPurposeCodeStoreProcedure(
-//			@Simple("${body[GetAMLPurposeCodesRequest][channelId]}") String channelId,
-//			@Simple("${body[GetAMLPurposeCodesRequest][transactionType]}") String transactionType,
-//			@Simple("${body[GetAMLPurposeCodesRequest][customerType]}") String customerType, Exchange ex)
-//			throws Exception {
-//	
-	
 	/**
-	 * Executes a stored procedure to retrieve AML Purpose Codes based on provided parameters.
+	 * Executes a stored procedure to retrieve AML Purpose Codes based on provided
+	 * parameters.
 	 * 
-	 * @param body The JSON body containing request data from client, including channelId, transactionType, and customerType
-	 * @param ex The Exchange object for handling exceptions
-	 * @return JSON response containing AML purpose codes retrieved from the database
-	 * @throws Exception If there is an error during database connection or procedure execution
+	 * @param body The JSON body containing request data from client, including
+	 *             channelId, transactionType, and customerType
+	 * @param ex   The Exchange object for handling exceptions
+	 * @return JSON response containing AML purpose codes retrieved from the
+	 *         database
+	 * @throws Exception If there is an error during database connection or
+	 *                   procedure execution
 	 */
-	public ObjectNode BancsAMLPurposeCodeStoreProcedure(@Body JsonNode body, Exchange ex) throws Exception {
+	public ObjectNode BancsAMLPurposeCodeStoreProcedure(
+			@Simple("${body[GetAMLPurposeCodesRequest][channelId]}") String channelId,
+			@Simple("${body[GetAMLPurposeCodesRequest][transactionType]}") String transactionType,
+			@Simple("${body[GetAMLPurposeCodesRequest][customerType]}") String customerType, Exchange ex)
+			throws Exception {
 
 		Connection conn = null;
 		OracleCallableStatement ocStatement = null;
 		ResultSet rs = null;
-
-		JsonNode oGetAMLPurposeCodesRequestBackend = body.get("GetAMLPurposeCodesRequest");
 
 		try {
 
@@ -59,12 +59,9 @@ public class BANCSDBConnectorImplDao {
 
 			ocStatement = (OracleCallableStatement) conn.prepareCall(strProcedure);
 
-//			ocStatement.setString(1, channelId);
-//			ocStatement.setString(2, transactionType);
-//			ocStatement.setString(3, customerType);
-			ocStatement.setString(1, oGetAMLPurposeCodesRequestBackend.get("channelId").asText());
-			ocStatement.setString(2, oGetAMLPurposeCodesRequestBackend.get("transactionType").asText());
-			ocStatement.setString(3, oGetAMLPurposeCodesRequestBackend.get("customerType").asText());
+			ocStatement.setString(1, channelId);
+			ocStatement.setString(2, transactionType);
+			ocStatement.setString(3, customerType);
 			ocStatement.registerOutParameter(4, OracleTypes.CURSOR);
 
 			ocStatement.execute();
